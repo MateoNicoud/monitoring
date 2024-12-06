@@ -1,0 +1,39 @@
+- name: Configure Alloy and Monitoring Tools
+  hosts: my_vm
+  become: true
+  vars:
+    alloy_user_groups:
+      - "systemd-journal"
+      - "adm"
+    alloy_config: |
+      logging {
+        level = "debug"
+        format = "logfmt"
+        write_to = [loki.process.alloy.receiver]
+      }
+
+      loki.process "alloy" {
+        stage.labels {
+          values = {
+            service_name= "alloy",
+          }
+        }
+        forward_to = [loki.write.default.receiver]
+      }
+
+      loki.write "default" {
+        endpoint {
+          url = "http://192.168.122.1:3100/loki/api/v1/push"
+        }
+      }
+
+      local.file_match "local_files" {
+          path_targets = [{"__path__" = "/var/log/*.log"}]
+          sync_period = "5s"
+      }
+
+    alloy_env_file_vars: "--server.http.listen-addr=0.0.0.0:12345"
+  roles:
+    - geerlingguy.node_exporter
+    - grafana.grafana.alloy
+    - auditd_monitoring

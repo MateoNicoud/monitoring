@@ -1,0 +1,8 @@
+#!/bin/bash
+
+THRESHOLD={{ disk_space_threshold | default(90) }}
+
+df -h | awk 'NR>1 { if (substr($5, 1, length($5)-1) > ENVIRON["THRESHOLD"]) print $0; }' | while read line
+do
+  logger -t DISK_SPACE_ALERT "Disk usage critical: $line"
+done

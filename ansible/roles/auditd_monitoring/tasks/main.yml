@@ -1,0 +1,35 @@
+---
+- name: Install Auditd
+  ansible.builtin.package:
+    name: auditd
+    state: present
+
+- name: Deploy audit.rules
+  ansible.builtin.copy:
+    src: audit.rules
+    dest: /etc/audit/rules.d/audit.rules
+    owner: root
+    group: root
+    mode: 0640
+  notify: Restart Auditd
+
+- name: Ensure Auditd service is running
+  ansible.builtin.service:
+    name: auditd
+    state: started
+    enabled: true
+
+- name: Deploy disk space monitoring script
+  ansible.builtin.template:
+    src: disk_space_check.sh.j2
+    dest: /usr/local/bin/disk_space_check.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Add cron job for disk space monitoring
+  ansible.builtin.cron:
+    name: "Check disk space"
+    user: root
+    job: "/usr/local/bin/disk_space_check.sh"
+

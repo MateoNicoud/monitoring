@@ -1,0 +1,3 @@
+---
+# Default threshold for disk space
+disk_space_threshold: 90

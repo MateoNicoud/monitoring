@@ -1,0 +1,15 @@
+# Monitor changes to /etc/passwd and /etc/shadow
+-w /etc/passwd -p wa -k passwd_changes
+-w /etc/shadow -p wa -k shadow_changes
+
+# Monitor changes to a critical configuration file
+-w /etc/important.conf -p wa -k config_changes
+
+# Monitor new open ports (modification of network configuration)
+-w /etc/services -p wa -k network_changes
+
+# Monitor failed connection attempts
+-a always,exit -F arch=b64 -S connect -F exit=-EACCES -k failed_connections
+
+# Log anything added to a directory of your choice (e.g., new executables)
+-w /opt/secure/ -p wa -k opt_secure_changes

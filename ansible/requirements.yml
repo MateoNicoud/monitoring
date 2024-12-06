@@ -1,0 +1,2 @@
+- name: geerlingguy.node_exporter
+  version: 2.1.0
